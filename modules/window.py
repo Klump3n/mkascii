@@ -23,15 +23,15 @@ class Window(object):
             "brightness": {
                 "name": "Brightness",
                 "value": 20,
-                "min": -255,
-                "max":  255,
+                "min": 0,
+                "max": 255,
                 "placement": 0
             },
             "contrast": {
                 "name": "Contrast",
                 "value": 20,
-                "min": -255,
-                "max":  255,
+                "min": 0,
+                "max": 127,
                 "placement": 1
             },
             "gamma": {
@@ -41,16 +41,6 @@ class Window(object):
                 "max": 512,
                 "placement": 2
             },
-            "dithering": {
-                "name": "Dithering",
-                "value": 0,
-                "min": 0,
-                "max": 2,
-                "options": [
-                    "DITHER_NONE", "DITHER_ERROR_DISTRIBUTION", "DITHER_FLOYD_STEINBERG"
-                ],
-                "placement": 3
-            },
             "invert": {
                 "name": "Invert",
                 "value": 0,
@@ -59,7 +49,24 @@ class Window(object):
                 "options": [
                     "False", "True"
                 ],
+                "placement": 3
+            },
+            "dithering": {
+                "name": "Dithering",
+                "value": 0,
+                "min": 0,
+                "max": 2,
+                "options": [
+                    "DITHER_NONE", "DITHER_ERROR_DISTRIBUTION", "DITHER_FLOYD_STEINBERG"
+                ],
                 "placement": 4
+            },
+            "random": {
+                "name": "Random Dithering",
+                "value": 0,
+                "min": 0,
+                "max": 10,
+                "placement": 5
             }
         }
         self._menu_entries = []
@@ -102,15 +109,16 @@ class Window(object):
         menu_contrast = self._menu["contrast"]["value"]
         menu_brightness = self._menu["brightness"]["value"]
         menu_gamma = self._menu["gamma"]["value"]
-        menu_dithering = self._menu["dithering"]["value"]
         menu_invert = self._menu["invert"]["value"]
-
+        menu_dithering = self._menu["dithering"]["value"]
+        menu_random_dither = self._menu["random"]["value"]
         return screen.render(
             contrast=menu_contrast,
             brightness=menu_brightness,
             gamma=menu_gamma/255,
             dithering_mode=menu_dithering,
-            inversion=menu_invert
+            inversion=menu_invert,
+            random=menu_random_dither
         )
 
     def _menu_state(self, key):
@@ -166,8 +174,10 @@ class Window(object):
         self._height = curses.LINES - 1
         self._width = curses.COLS - 1
 
-        self._command_window = curses.newwin(7, self._width, 0, 0)
-        self._output_window = curses.newwin(self._height - 7, self._width, 7, 0)
+        menu_space = len(self._menu.keys()) + 2
+
+        self._command_window = curses.newwin(menu_space, self._width, 0, 0)
+        self._output_window = curses.newwin(self._height - menu_space, self._width, menu_space, 0)
         self._command_window.keypad(1)
         headline = "Displaying {} [press q to quit]".format(self._image_path)
 
